@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access To Yamch's Heart & Quiz</title>
+    <style>
+        /* --- Styles from Yamch.html --- */
+        :root {
+            --primary-color: #ff2e63;
+            --secondary-color: #6a0572;
+            --error-color: #ff1e56;
+            --dark-color: #212529;
+            --message-background: white; /* Added from quiz.html for consistency */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-image: url(https://i.pinimg.com/1200x/cf/7d/14/cf7d14d12409be9c9a9aed8732775c45.jpg); /* Initial background */
+            background-size: cover;
+            background-position: center;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark-color);
+            transition: background-image 0.5s ease; /* Smooth transition for background image */
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            padding: 20px; /* Added padding from quiz.html */
+        }
+
+        .content {
+            padding: 30px; /* Original padding from Yamch.html */
+            text-align: center; /* Added from quiz.html */
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        p.description {
+            color: #666;
+            margin-bottom: 30px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(255,255,255,0.3);
+            background-color: rgba(255,255,255,0.6);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .error {
+            color: var(--error-color);
+            margin-top: 5px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .success {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(76, 201, 240, 0.1);
+            border-radius: 8px;
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        /* --- Styles from quiz.html --- */
+        .quiz-question {
+            margin-bottom: 15px;
+            padding: 20px;
+            border-radius: 10px;
+            color: #333;
+            font-size: 18px;
+            line-height: 1.5;
+            background-color: rgba(255, 255, 255, 0.8); /* Solid color for better visibility */
+        }
+
+        .choice-button { /* Overrides previous button style for quiz buttons */
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 5px 0;
+            transition: all 0.3s;
+        }
+
+        .choice-button:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+
+        .fade-out {
+            animation: fadeOut 0.5s ease forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .letter-earned {
+            color: var(--primary-color);
+            font-weight: bold;
+            font-size: 24px; /* Increased font size for emphasis */
+            margin-top: 10px;
+            display: none; /* Initially hidden */
+        }
+
+        .heartwarming-message {
+            color: #ff69b4; /* Heartwarming message color */
+            font-size: 20px;
+            margin-top: 10px;
+            display: none; /* Initially hidden */
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; /* Could be more or less, depending on screen size */
+            text-align: center;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        /* Final screen styles */
+        .final-screen {
+            display: none; /* Hidden by default */
+            text-align: center;
+        }
+
+        .magic-word-input {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid var(--primary-color);
+            border-radius: 5px;
+            width: 80%;
+        }
+
+        /* Message box styles */
+        .message-box {
+            background: var(--message-background); /* White background for message box */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            color: black; /* Text color for message box */
+        }
+
+        /* Slide out animation */
+        @keyframes slideOut {
+            from { transform: translateY(0); }
+            to { transform: translateY(-100%); opacity: 0; }
+        }
+
+        .slide-out {
+            animation: slideOut 0.5s forwards;
+        }
+
+        /* Specific styles for the passcode and quiz sections */
+        #passcodeSection {
+            display: block; /* Initially visible */
+        }
+
+        #quizSection {
+            display: none; /* Initially hidden */
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="mainContainer">
+        <!-- Passcode Section (from Yamch.html) -->
+        <div class="content" id="passcodeSection">
+            <h1>Access To Yamch's Heart</h1>
+            <p class="description">
+                Welcome to Yamch's Heart! 💖<br>
+                Please enter the authorized passcode to continue. ^^<br>
+                Clue: It's my phone password!
+            </p>
+            
+            <div class="form-group">
+                <label for="passcode">Enter Passcode</label>
+                <input type="password" id="passcode" placeholder="••••••" autocomplete="off">
+                <div class="error" id="errorText">Incorrect passcode. Please try again.</div>
+            </div>
+            
+            <button id="submitBtn">Continue</button>
+            
+            <div class="success" id="successMessage">
+                <h2>Access Granted</h2>
+                <p>Redirecting to the quiz...</p>
+            </div>
+        </div>
+
+        <!-- Quiz Section (from quiz.html) -->
+        <div class="content" id="quizSection">
+            <div class="quiz-question" id="questionContainer"></div>
+            <div id="choicesContainer"></div>
+            <div class="error" id="quizErrorText"></div>
+            <div class="success" id="quizSuccessText"></div>
+            <div class="letter-earned" id="letterEarnedText"></div>
+            <div class="heartwarming-message" id="heartwarmingMessage"></div>
+            <div class="final-screen" id="finalScreen">
+                <h2>Congratulations! 🎉</h2>
+                <p>You've collected the letters: <span id="collectedLetters"></span>. You can spell "Yves"! 🎉</p>
+                <p>To unlock Yamch's heartfelt message, please enter the magic word:</p>
+                <input type="text" id="magicWordInput" class="magic-word-input" placeholder="Enter magic word here...">
+                <button id="submitMagicWordBtn" class="choice-button">Submit</button>
+                <div class="error" id="magicWordErrorText" style="display: none; color: var(--error-color);"></div>
+            </div>
+            <div class="message-box" id="messageBox" style="display: none;">
+                <p>Hello, lovieee!</p>
+                <p>It’s officially been 3 weeks since we started this relationship officially, and to be honest, it still feels so surreal na kasama pa rin kita hanggang ngayon. We've known each other for almost 2 years bago natin ginawa itong official, and all I can say is... thank You, Lord, sa maganda, matalino, at mabait kong girlfriend.</p>
+                <p>Wala na akong ibang hihilingin pa kundi ang makasama ka habang buhay. Meeting you is truly something I consider a gift from God.</p>
+                <p>Walang Liam na mapagpakumbaba kung wala ka. Walang Liam na maunawain kung wala ka. At walang Liam na masaya kung wala ka.</p>
+                <p>Your presence brought the love I didn’t even know I needed — walang labis, walang kulang. Tamang-timpla lang, FRFR.</p>
+                <p>May mga araw na malungkot, may mga araw na sobrang saya — pero kahit ano pa 'yan, hindi 'yun hadlang para mahalin kita araw-araw. Ikaw at ikaw lang ang pipiliin ko araw-araw.</p>
+                <p>Wala nang iba. Ikaw lang. Tatapusin natin 'tong college magkasama, para sa pangarap nating bahay na walang sigawan, walang ingay — puro pagmamahalan lang.</p>
+                <p>Mahal na mahal kita. I love you to the moon and back. I love you from Jolo to Batanes. I love you to the bone. I love you forever. I love you for eternity.</p>
+                <p>Happy 3rd Monthsary, my love — to the best person in the whole universe. You're everything I ever wanted.</p>
+                <p>Loving you dearly, Liam</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal (from quiz.html) -->
+    <div id="introModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeModalBtn">&times;</span>
+            <h2>✨ Before you begin... ✨</h2>
+            <div class="intro-message">
+                To unlock a special message from Yamch to his loviedubdubdub, you need to collect letters hidden in each correct answer. 💌<br>
+                Answer the questions correctly, and each one will reveal a piece of the magic word you’ll need to unlock his heartfelt surprise. 💖🔐<br>
+                Are you ready? Let’s begin! 🎉
+            </div>
+            <button id="startQuizBtn" class="choice-button">Start Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Elements from Yamch.html ---
+            const passcodeInput = document.getElementById('passcode');
+            const submitBtn = document.getElementById('submitBtn');
+            const errorText = document.getElementById('errorText');
+            const successMessage = document.getElementById('successMessage');
+            const mainContainer = document.getElementById('mainContainer'); // Renamed from 'container' to avoid conflict
+            const passcodeSection = document.getElementById('passcodeSection');
+
+            // --- Elements from quiz.html ---
+            const introModal = document.getElementById('introModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const startQuizBtn = document.getElementById('startQuizBtn');
+            const questionContainer = document.getElementById('questionContainer');
+            const choicesContainer = document.getElementById('choicesContainer');
+            const quizErrorText = document.getElementById('quizErrorText');
+            const quizSuccessText = document.getElementById('quizSuccessText');
+            const letterEarnedText = document.getElementById('letterEarnedText');
+            const heartwarmingMessage = document.getElementById('heartwarmingMessage');
+            const finalScreen = document.getElementById('finalScreen');
+            const collectedLettersSpan = document.getElementById('collectedLetters');
+            const magicWordInput = document.getElementById('magicWordInput');
+            const submitMagicWordBtn = document.getElementById('submitMagicWordBtn');
+            const magicWordErrorText = document.getElementById('magicWordErrorText');
+            const messageBox = document.getElementById('messageBox');
+            const quizSection = document.getElementById('quizSection'); // New element for quiz content
+
+            // --- Constants ---
+            const CORRECT_PASSCODE = "032417";
+            const questions = [
+                { question: "What is Yamch's favorite color? 🎨", choices: ["Pink", "Yellow", "Green", "Black"], answer: "Green", letter: "Y", background: "#f8bbd0" }, // Light pink
+                { question: "What is Yamch's favorite flower? 🌼", choices: ["Lily", "Tulip", "Marigold", "Orchid"], answer: "Lily", letter: "V", background: "#fff3e0" }, // Light peach
+                { question: "When is the date of your first monthsary together? 📅", answer: "April 14, 2024", letter: "E", background: "#e8f5e9" }, // Light green
+                { question: "What is the full name of Liam’s wifey? 💍", answer: "Francyne Eclair A. Cifra", letter: "S", background: "#bbdefb" } // Light blue
+            ];
+            let currentQuestionIndex = 0;
+            let collectedLetters = "";
+
+            // --- Passcode Logic (Modified from Yamch.html) ---
+            submitBtn.addEventListener('click', validatePasscode);
+            passcodeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    validatePasscode();
+                }
+            });
+            
+            function validatePasscode() {
+                const enteredPasscode = passcodeInput.value.trim();
+                
+                if (enteredPasscode === CORRECT_PASSCODE) {
+                    errorText.style.display = 'none';
+                    successMessage.style.display = 'block';
+                    passcodeInput.style.borderColor = '#4BB543';
+                    
+                    // Transition to quiz section after 2 seconds
+                    setTimeout(() => {
+                        passcodeSection.style.display = 'none'; // Hide passcode section
+                        quizSection.style.display = 'block'; // Show quiz section
+                        introModal.style.display = "block"; // Show quiz intro modal
+                    }, 2000);
+                } else {
+                    errorText.style.display = 'block';
+                    passcodeInput.style.borderColor = 'var(--error-color)';
+                    mainContainer.classList.add('shake');
+                    
+                    setTimeout(() => {
+                        mainContainer.classList.remove('shake');
+                    }, 500);
+                    
+                    passcodeInput.value = '';
+                    passcodeInput.focus();
+                }
+            }
+
+            // --- Quiz Logic (from quiz.html) ---
+            // Close the modal when the user clicks on <span> (x)
+            closeModalBtn.onclick = function() {
+                introModal.style.display = "none";
+            }
+
+            // Start the quiz when the start button is clicked
+            startQuizBtn.addEventListener('click', function() {
+                introModal.style.display = 'none'; // Hide the modal
+                loadQuestion(); // Load the first question
+            });
+
+            function loadQuestion() {
+                quizErrorText.style.display = 'none';
+                quizSuccessText.style.display = 'none';
+                letterEarnedText.style.display = 'none';
+                heartwarmingMessage.style.display = 'none';
+                choicesContainer.innerHTML = '';
+                questionContainer.style.display = 'block';
+                choicesContainer.style.display = 'block';
+
+                if (currentQuestionIndex < questions.length) {
+                    const currentQuestion = questions[currentQuestionIndex];
+                    questionContainer.textContent = currentQuestion.question;
+                    questionContainer.style.backgroundColor = currentQuestion.background;
+
+                    if (currentQuestion.choices) {
+                        currentQuestion.choices.forEach(choice => {
+                            const button = document.createElement('button');
+                            button.textContent = choice;
+                            button.classList.add('choice-button');
+                            button.addEventListener('click', () => checkAnswer(choice));
+                            choicesContainer.appendChild(button);
+                        });
+                    } else {
+                        questionContainer.textContent += " (Type your answer below)";
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.placeholder = "Type your answer here...";
+                        input.id = 'answerInput';
+                        choicesContainer.appendChild(input);
+                        const submitButton = document.createElement('button');
+                        submitButton.textContent = "Submit Answer";
+                        submitButton.classList.add('choice-button');
+                        submitButton.addEventListener('click', () => checkTextAnswer(input.value));
+                        choicesContainer.appendChild(submitButton);
+                    }
+                } else {
+                    collectedLettersSpan.textContent = collectedLetters;
+                    finalScreen.style.display = 'block';
+                    choicesContainer.style.display = 'none';
+                    questionContainer.style.display = 'none'; // Hide question container on final screen
+                }
+            }
+
+            function checkAnswer(selectedChoice) {
+                const currentQuestion = questions[currentQuestionIndex];
+                if (selectedChoice === currentQuestion.answer) {
+                    collectedLetters += currentQuestion.letter;
+                    letterEarnedText.textContent = `You earned the letter: ${currentQuestion.letter}!`;
+                    letterEarnedText.style.display = 'block';
+                    heartwarmingMessage.textContent = "You're doing amazing! Keep it up! 💖";
+                    heartwarmingMessage.style.display = 'block';
+                    quizSuccessText.textContent = "Correct! 🎉";
+                    quizSuccessText.style.display = 'block';
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        transitionToNextQuestion();
+                    }, 2000);
+                } else {
+                    quizErrorText.textContent = "Incorrect answer. Try again.";
+                    quizErrorText.style.display = 'block';
+                }
+            }
+
+            function checkTextAnswer(userAnswer) {
+                const currentQuestion = questions[currentQuestionIndex];
+                if (userAnswer.trim().toLowerCase() === currentQuestion.answer.toLowerCase()) {
+                    collectedLetters += currentQuestion.letter;
+                    letterEarnedText.textContent = `You earned the letter: ${currentQuestion.letter}!`;
+                    letterEarnedText.style.display = 'block';
+                    heartwarmingMessage.textContent = "You're doing amazing! Keep it up! 💖";
+                    heartwarmingMessage.style.display = 'block';
+                    quizSuccessText.textContent = "Correct! 🎉";
+                    quizSuccessText.style.display = 'block';
+                    setTimeout(() => {
+                        currentQuestionIndex++;
+                        transitionToNextQuestion();
+                    }, 2000);
+                } else {
+                    quizErrorText.textContent = "Incorrect answer. Try again.";
+                    quizErrorText.style.display = 'block';
+                }
+            }
+
+            function transitionToNextQuestion() {
+                questionContainer.classList.add('fade-out');
+                setTimeout(() => {
+                    questionContainer.classList.remove('fade-out');
+                    loadQuestion();
+                }, 500);
+            }
+
+            // Handle magic word submission
+            submitMagicWordBtn.addEventListener('click', function() {
+                const magicWord = magicWordInput.value.trim();
+                if (magicWord.toLowerCase() === "yves") {
+                    // Change body background image
+                    document.body.style.backgroundImage = "url('https://i.pinimg.com/originals/20/0a/0e/200a0e9c9ccd22f0138a93ef7f817df5.png')";
+                    document.body.style.backgroundColor = "transparent"; // Ensure background image is visible
+
+                    // Slide out the final screen
+                    finalScreen.classList.add('slide-out');
+                    setTimeout(() => {
+                        finalScreen.style.display = 'none';
+                        questionContainer.style.display = 'none';
+                        messageBox.style.display = 'block';
+                    }, 500);
+                } else {
+                    magicWordErrorText.textContent = "Incorrect magic word. Please try again.";
+                    magicWordErrorText.style.display = 'block';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
